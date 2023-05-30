@@ -1,14 +1,7 @@
 import os
 import argparse
 from torch.backends import cudnn
-
-class CFG:
-    # hyperparameters
-    MAX_LEN = 256
-    TRAIN_BATCH_SIZE = 32
-    VALID_BATCH_SIZE = 32
-    EPOCHS = 1
-    LEARNING_RATE = 1e-05
+import torch
 
 class CFG:
     # For fast training.
@@ -27,7 +20,7 @@ class CFG:
     lambda_gp = 10
     
     # Training configuration.
-    dataset = 'BraTS2020' # choices = ['BraTS2020', 'IXI', 'Both']
+    dataset = 'Both' # choices = ['BraTS2020', 'IXI', 'Both']
     batch_size = 16
     num_iters = 200000
     num_iters_decay = 100000
@@ -42,13 +35,16 @@ class CFG:
     test_iters = 200000
 
     # Miscellaneous.
+    # device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    device = torch.device('cpu')
     num_workers = 1
     mode = 'train' # choices = ['train', 'test']
     use_tensorboard = True
 
     # Directories.
-    brats2020_image_dir = '/media/hanlhn/96446582446565C9/BRATS_DATA/BraTS2020 StarGANs/image_2D/train'
-    ixi_image_dir = '/media/hanlhn/96446582446565C9/BRATS_DATA/IXI StarGANs/image_2D/train'
+    G_path = '/home/han/Desktop/hanlhn_dut/Generate-MRI-FastAPI/generate_mri_fastapi/generate_mri_fastapi/models/200000-G.ckpt'
+    brats2020_image_dir = '/home/han/MRI_DATA/BraTS2020 StarGANs/image_2D/train'
+    ixi_image_dir = '/home/han/MRI_DATA/IXI StarGANs/image_2D/train'
     log_dir = 'stargan_both/logs'
     model_save_dir = 'stargan_both/models'
     sample_dir = 'stargan_both/samples'

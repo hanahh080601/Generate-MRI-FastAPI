@@ -1,24 +1,27 @@
 import torch
 import numpy as np
-from transformers import BertTokenizer, BertModel
-from models.bert import BERTClass
-from config.config import *
+from config.config import CFG
+from models.stargan import Generator, ResUnet
+from torch.utils import data
+from torchvision import transforms as T
+from torchvision.datasets import ImageFolder
 
-target_index = {0: 'joy', 
-                1: 'sadness', 
-                2: 'anger', 
-                3: 'fear', 
-                4: 'love', 
-                5: 'surprise'}
 
-tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-
-class Prediction:
-    def __init__(self, device) -> None:
-        self.device = device
-        self.model = BERTClass()
-        checkpoint = torch.load('models/best_model.pt', map_location=device)
-        self.model.load_state_dict(checkpoint['state_dict'])
+class GeneratorModel:
+    def __init__(self, model='stargan') -> None:
+        self.device = CFG.device
+        if CFG.dataset in ['BraTS2020', 'IXI']:
+            if model == 'stargan':
+                self.model = Generator(CFG.g_conv_dim, CFG.c_dim, CFG.g_repeat_num) 
+            else:
+                self.model = ResUnet(CFG.g_conv_dim, CFG.c_dim, CFG.g_repeat_num) 
+        elif CFG.dataset in ['Both']:
+            if model == 'stargan':
+                self.model = Generator(CFG.g_conv_dim, CFG.c_dim+CFG.c2_dim+2, CFG.g_repeat_num)
+            else:
+                self.model = ResUnet(CFG.g_conv_dim, CFG.c_dim+CFG.c2_dim+2, CFG.g_repeat_num)
+        self.model.to(self.device)
+        self.model.load_state_dict(torch.load(CFG.G_path, map_location=lambda storage, loc: storage))
 
     def preprocess(self, comment):
         encodings = tokenizer.encode_plus(
@@ -34,7 +37,7 @@ class Prediction:
         )
         return encodings
 
-    def predict(self, input) -> str:
+    def generate(self, input) -> str:
         # process data
         preprocessed_input = self.preprocess(input)
         self.model.eval()

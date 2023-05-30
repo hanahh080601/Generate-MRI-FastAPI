@@ -1,5 +1,7 @@
 from fastapi import FastAPI
-from routes.comment import comment
+from fastapi.staticfiles import StaticFiles
+from routes.image import image
 
 app = FastAPI()
-app.include_router(comment)
+app.mount("/static", StaticFiles(directory="static"), name="static")
+app.include_router(image)

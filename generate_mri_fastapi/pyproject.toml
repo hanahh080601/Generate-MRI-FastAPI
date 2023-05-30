@@ -13,6 +13,11 @@ torch = "2.0.0"
 torchio = "0.18.90"
 torchvision = "0.15.1"
 tqdm = "4.65.0"
+pydantic = "^1.10.8"
+fastapi = "^0.95.2"
+uvicorn = {extras = ["standard"], version = "^0.22.0"}
+pymongo = "^4.3.3"
+python-multipart = "^0.0.6"
 
 [tool.poetry.dev-dependencies]
 

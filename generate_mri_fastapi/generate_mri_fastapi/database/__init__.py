@@ -1,1 +1,1 @@
-from database.database import add_comment, conn, settings
+from database.database import conn, settings
