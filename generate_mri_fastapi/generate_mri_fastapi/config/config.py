@@ -35,11 +35,12 @@ class CFG:
     test_iters = 200000
 
     # Miscellaneous.
-    # device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    device = torch.device('cpu')
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     num_workers = 1
     mode = 'train' # choices = ['train', 'test']
     use_tensorboard = True
+    ixi_contrast_list = ['mra', 'pd', 't1', 't2']
+    brats_contrast_list = ['flair', 't1', 't1ce', 't2']
 
     # Directories.
     G_path = '/home/han/Desktop/hanlhn_dut/Generate-MRI-FastAPI/generate_mri_fastapi/generate_mri_fastapi/models/200000-G.ckpt'
