@@ -1,0 +1,29 @@
+.page-container {
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.input-form-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    /* width: 100%; */
+}
+
+
+.page-title {
+    text-decoration: none;
+    font-size: 32px;
+    color: var(--solid-pink);
+    font-family: 'Press Start 2P', cursive;
+    text-transform: uppercase;
+}
+
+.row-2 {
+    display: flex;
+    
+}

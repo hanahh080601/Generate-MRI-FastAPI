@@ -43,9 +43,10 @@ class CFG:
     brats_contrast_list = ['flair', 't1', 't1ce', 't2']
 
     # Directories.
-    G_path = '/home/han/Desktop/hanlhn_dut/Generate-MRI-FastAPI/generate_mri_fastapi/generate_mri_fastapi/models/200000-G.ckpt'
-    brats2020_image_dir = '/home/han/MRI_DATA/BraTS2020 StarGANs/image_2D/train'
-    ixi_image_dir = '/home/han/MRI_DATA/IXI StarGANs/image_2D/train'
+    G_stargan_path = '/home/han/Desktop/hanlhn_dut/StarGANs-Generate-MRI-2D-images/stargan_both/models/200000-G.ckpt'
+    G_resunet_path = '/home/han/Desktop/hanlhn_dut/StarGANs-Generate-MRI-2D-images/resunet_both/models/200000-G.ckpt'
+    brats2020_image_dir = '/home/han/MRI_DATA/BraTS2020 StarGANs/image_2D/test'
+    ixi_image_dir = '/home/han/MRI_DATA/IXI StarGANs/image_2D/test'
     log_dir = 'stargan_both/logs'
     model_save_dir = 'stargan_both/models'
     sample_dir = 'stargan_both/samples'

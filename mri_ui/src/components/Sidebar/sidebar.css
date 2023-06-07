@@ -1,0 +1,74 @@
+.sidebar {
+    background-color: var(--set-dark-gray);
+    width: 320px;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.logo-container {
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.logo__s1, .logo__s2 {
+    margin-left: 5px;
+    text-decoration: none;
+    font-size: 32px;
+    color: var(--set-light-pink);
+    font-family: 'Press Start 2P', cursive;
+}
+
+.logo__s2 {
+    font-size: 43px;
+    color: var(--solid-pink);
+}
+
+.logo-name {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: self-start;
+}
+
+.logo-image {
+    width: 110px;
+}
+
+.sidebar-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 80%;
+}
+
+.sidebar-item {
+    padding: 10px 20px;
+    margin: 10px 0;
+}
+
+.sidebar-item:hover {
+    color: var(--set-light-pink);
+}
+
+.sidebar-item.active {
+    color: var(--solid-pink);
+    font-weight: 800;
+}
+
+.sidebar-item__icon {
+    margin-right: 16px;
+    font-size: 24px;
+}
+
+.sidebar-item__label {
+    font-size: 24px;
+}
+
+.sidebar-footer {
+    margin-top: 150px;
+}

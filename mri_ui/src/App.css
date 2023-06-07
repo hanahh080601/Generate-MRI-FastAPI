@@ -1,0 +1,57 @@
+:root {
+  --white: #ffffff;
+  --dark-gray: #1b1b1a;
+  --solid-pink: #ec9e9e;
+  --set-pink: #f3b6b6;
+  --set-light-pink: #fdcdcd;
+  --set-white-pink: #fde1e1;
+  --set-solid-pink: #f58989;
+  --dark-pink: #c97676;
+  --set-gray: #4a4a48;
+  --set-light-gray: #a39393;
+  --set-dark-gray: #2b2b28;
+  --set-white: #ebebe3;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #666;
+}
+
+.App {
+  width: 100vw;
+  height: 100vh;
+  background-color: var(--dark-gray);
+  display: flex;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Inconsolata', monospace;
+  overflow: hidden;
+}
+
+a {
+  text-decoration: none;
+  color: var(--set-white);
+}
+
+.main-content {
+  flex: 1;
+  padding: 10px;
+  overflow-y: scroll;
+}
