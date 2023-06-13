@@ -50,7 +50,7 @@ export default function Test() {
 
     return <>
         <div className='page-container'>
-            <h1 className='page-title'>Test page</h1>
+            <h1 className='page-title'>MRI SYNTHESIS</h1>
             <div className="input-form-container">
                 <Input
                     name="source_contrast"
@@ -62,7 +62,13 @@ export default function Test() {
                     placeholder="Target Contrast"
                     value={targetContract}
                     setValue={setTargetContract} />
-                <InputSelection data={select} setData={setSelect} />
+                <InputSelection
+                    label="dataset"
+                    name="dataset"
+                    data={select}
+                    setData={setSelect}
+                    options={[{ value: 'IXI', label: 'IXI' }, { value: 'BraTS2020', label: 'BraTS2020' }]}
+                />
 
                 <InputFile image={image} setImage={setImage} name="file" />
                 <Button onClick={isLoading ? () => { } : sendFile}>Generate</Button>

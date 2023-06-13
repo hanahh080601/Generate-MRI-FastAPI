@@ -104,4 +104,31 @@ class CustomDatasetOneImage(Dataset):
                 self.data_path[contrast][index]
             )
         return data
+    
+class DatasetOnlyImage(Dataset):
+    def __init__(self, image, source_contrast, target_contrast, transform):
+        self.image = image
+        self.source_contrast = source_contrast
+        self.transform = transform
+        self.data_path = {}
+        if target_contrast in CFG.ixi_contrast_list:
+            self.contrast_list =  CFG.ixi_contrast_list
+            self.dataset_dir = CFG.ixi_image_dir
+        else:
+            self.contrast_list =  CFG.brats_contrast_list
+            self.dataset_dir = CFG.brats2020_image_dir
+
+    def __len__(self):
+        return 1
+
+    def __getitem__(self, idx):
+        data = {}
+
+        for contrast in self.contrast_list:
+            if contrast == self.source_contrast:
+                data[contrast] = (
+                    self.transform(self.image),
+                    [id for id in range(len(self.contrast_list)) if self.contrast_list[id] == contrast][0],
+                )
+        return data
 

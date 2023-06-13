@@ -3,22 +3,30 @@ import numpy as np
 from config.config import CFG
 from models.stargan import Generator, ResUnet
 from torchvision import transforms as T
-from database.dataset import CustomDataset, CustomDatasetOneImage, CustomDatasetFaster
+from database.dataset import CustomDatasetOneImage, CustomDatasetFaster, DatasetOnlyImage
 from torch.utils.data import DataLoader
 from utils.metrics import Metrics
 from torchvision.utils import save_image
-from database.database import push_s3
 
 class GeneratorModel:
-    def __init__(self, model='stargan') -> None:
-        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    def __init__(self, model='stargan', mode='both') -> None:
+        self.device = CFG.device
 
-        if model == 'stargan':
+        if model == 'stargan' and mode == 'both':
             self.model = Generator(CFG.g_conv_dim, CFG.c_dim+CFG.c2_dim+2, CFG.g_repeat_num)
-            self.model.load_state_dict(torch.load(CFG.G_stargan_path, map_location=lambda storage, loc: storage))
-        else:
+            self.model.load_state_dict(torch.load(CFG.G_stargan_both_path, map_location=lambda storage, loc: storage))
+
+        elif model == 'resunet' and mode == 'both':
             self.model = ResUnet(CFG.g_conv_dim, CFG.c_dim+CFG.c2_dim+2, CFG.g_repeat_num)
-            self.model.load_state_dict(torch.load(CFG.G_resunet_path, map_location=lambda storage, loc: storage))
+            self.model.load_state_dict(torch.load(CFG.G_resunet_both_path, map_location=lambda storage, loc: storage))
+
+        elif model == 'stargan' and mode == 'single':
+            self.model = Generator(CFG.g_conv_dim, CFG.c_dim, CFG.g_repeat_num)
+            self.model.load_state_dict(torch.load(CFG.G_stargan_single_path, map_location=lambda storage, loc: storage))
+            
+        else:
+            self.model = ResUnet(CFG.g_conv_dim, CFG.c_dim, CFG.g_repeat_num)
+            self.model.load_state_dict(torch.load(CFG.G_resunet_single_path, map_location=lambda storage, loc: storage))
 
         self.model.to(self.device)
         self.metrics = Metrics()
@@ -32,7 +40,7 @@ class GeneratorModel:
 
     def create_transformer(self):
         transform = []
-        transform.append(T.Resize(CFG.image_size))
+        transform.append(T.Resize((CFG.image_size, CFG.image_size)))
         transform.append(T.ToTensor())
         transform.append(T.Normalize(mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5)))
         transform = T.Compose(transform)
@@ -57,6 +65,67 @@ class GeneratorModel:
         """Convert the range from [-1, 1] to [0, 1]."""
         out = (x + 1) / 2
         return out.clamp_(0, 1)
+
+    def generate_single_dataset(self, image, source_contrast, target_contrast):
+        custom_dataset = DatasetOnlyImage(image, source_contrast, target_contrast, self.create_transformer())
+        data_loader = DataLoader(dataset=custom_dataset, batch_size=1, shuffle=True, num_workers=1)
+        with torch.no_grad():
+            for i, data in enumerate(data_loader):
+                (x_real, c_org) = data[source_contrast]
+                # Prepare input images and target domain labels.
+                print(x_real.shape)
+                x_real = x_real.to(self.device)
+                c_trg_list = self.create_labels(c_org, CFG.c_dim)
+
+                for j, c_trg in enumerate(c_trg_list):
+                    if j == CFG.ixi_contrast_list.index(target_contrast):
+                        x_fake = self.model(x_real.to(self.device), c_trg.to(self.device))
+                break
+
+            generated_path = 'generated_with_image.jpg'
+            source_path = 'source_with_image.jpg'
+
+            save_image(self.denorm(x_fake.data.cpu()), generated_path, nrow=1, padding=0)
+            save_image(self.denorm(x_real.data.cpu()), source_path, nrow=1, padding=0)
+            return source_path, generated_path
+    
+    def generate(self, image, source_contrast, target_contrast):
+        custom_dataset = DatasetOnlyImage(image, source_contrast, target_contrast, self.create_transformer())
+        data_loader = DataLoader(dataset=custom_dataset, batch_size=1, shuffle=True, num_workers=1)
+        with torch.no_grad():
+            for i, data in enumerate(data_loader):
+                (x_real, c_org) = data[source_contrast]
+                c_org = c_org.to(self.device)
+                # HERE
+                c_ixi_list = self.create_labels(c_org, CFG.c_dim)
+                zero_brats2020 = torch.zeros(x_real.size(0), CFG.c_dim).to(self.device)  
+                mask_ixi = self.label2onehot(torch.ones(x_real.size(0)), 2).to(self.device)
+                c_brats2020_list = self.create_labels(c_org, CFG.c_dim)
+                zero_ixi = torch.zeros(x_real.size(0), CFG.c_dim).to(self.device)             
+                mask_brats2020 = self.label2onehot(torch.zeros(x_real.size(0)), 2).to(self.device)  
+                
+                if target_contrast in CFG.ixi_contrast_list:
+                    for j, c_fixed in enumerate(c_ixi_list):
+                        if j == CFG.ixi_contrast_list.index(target_contrast):
+                            c_trg = torch.cat([zero_brats2020, c_fixed, mask_ixi], dim=1)
+                            x_fake = self.model(x_real.to(self.device), c_trg.to(self.device))
+                            
+
+                else:
+                    for j, c_fixed in enumerate(c_brats2020_list):
+                        if j == CFG.brats_contrast_list.index(target_contrast):
+                            c_trg = torch.cat([c_fixed, zero_ixi, mask_brats2020], dim=1)
+                            x_fake = self.model(x_real.to(self.device), c_trg.to(self.device))
+                break
+
+            generated_path = 'generated_with_image.jpg'
+            source_path = 'source_with_image.jpg'
+
+            save_image(self.denorm(x_fake.data.cpu()), generated_path, nrow=1, padding=0)
+            save_image(self.denorm(x_real.data.cpu()), source_path, nrow=1, padding=0)
+
+            return source_path, generated_path
+
         
     def generate_faster(self, dataset, source_contrast, target_contrast):
         data_loader = self.data_loader_ixi if dataset == 'IXI' else self.data_loader_brats

@@ -5,7 +5,7 @@ import axiosClient from "../services/http"
 import Card from '../components/Card/Card';
 import Input from '../components/Input';
 import Button from '../components/Button';
-import InputSelection from '../components/SelectionBox';
+import InputFile from '../components/InputFile';
 import './style.css';
 
 export default function Test() {
@@ -18,18 +18,27 @@ export default function Test() {
     const [select, setSelect] = useState()
     console.log(select)
 
-    const send = async () => {
+    const sendFile = async () => {
         try {
             setIsLoading(true)
             setData(null)
-            const res = await axiosClient.post("/generate/input_target_contrast", null, {
-                params: { ["dataset"]: select, ["source_contrast"]: sourceContract, ["target_contrast"]: targetContract }
-            })
+            const formData = new FormData()
+            formData.append("file", image)
+            const res = await axiosClient.post(
+                "/generate/out_of_dataset",
+                formData,
+                {
+                    headers: { "Content-Type": "multipart/form-data" },
+                    params: {
+                        ["src_contrast"]: sourceContract,
+                        ["trg_contrast"]: targetContract
+                    }
+                }
+            )
             console.log(res)
             if (res) {
                 setData(res)
             }
-
         } catch (err) {
             console.log(err)
         } finally {
@@ -51,15 +60,9 @@ export default function Test() {
                     placeholder="Target Contrast"
                     value={targetContract}
                     setValue={setTargetContract} />
-                <InputSelection
-                    label="dataset"
-                    name="dataset"
-                    data={select}
-                    setData={setSelect}
-                    options={[{ value: 'IXI', label: 'IXI' }, { value: 'BraTS2020', label: 'BraTS2020' }]}
-                />
 
-                <Button onClick={isLoading ? () => { } : send}>Generate</Button>
+                <InputFile image={image} setImage={setImage} name="file" />
+                <Button onClick={isLoading ? () => { } : sendFile}>Generate</Button>
 
             </div>
             <Puff

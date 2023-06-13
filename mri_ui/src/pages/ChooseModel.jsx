@@ -15,9 +15,8 @@ export default function ChooseModel() {
     const [image, setImage] = useState(null)
     const [data, setData] = useState(null)
     const [isLoading, setIsLoading] = useState(false)
-
-    const [select, setSelect] = useState()
-    console.log(select)
+    const [dataset, setDataset] = useState()
+    const [model, setModel] = useState()
 
     const sendFile = async () => {
         try {
@@ -26,12 +25,12 @@ export default function ChooseModel() {
             const formData = new FormData()
             formData.append("file", image)
             const res = await axiosClient.post(
-                "/generate/uploaded_file",
+                "/generate/uploaded_file_choosing_model",
                 formData,
                 {
                     headers: { "Content-Type": "multipart/form-data" },
                     params: {
-                        ["dataset"]: select,
+                        ["model"]: dataset,
                         ["src_contrast"]: sourceContract,
                         ["trg_contrast"]: targetContract
                     }
@@ -50,26 +49,43 @@ export default function ChooseModel() {
 
     return <>
         <div className='page-container'>
-            <h1 className='page-title'>Test page</h1>
+            <h1 className='page-title'>MRI SYNTHESIS</h1>
             <div className="input-form-container">
-                {/* <div className="row-2">
-                    
+                <div className="row-2">
+                    <div className="column">
+                        <Input
+                            name="source_contrast"
+                            placeholder="Source Contrast"
+                            value={sourceContract}
+                            setValue={setSourceContract} />
+                    </div>
+                    <div className="column">
+                        <Input
+                            name="target_contrast"
+                            placeholder="Target Contrast"
+                            value={targetContract}
+                            setValue={setTargetContract} />
+                    </div>
                 </div>
                 <div className="row-2">
-                </div> */}
-                <Input
-                    name="source_contrast"
-                    placeholder="Source Contrast"
-                    value={sourceContract}
-                    setValue={setSourceContract} />
-                <Input
-                    name="target_contrast"
-                    placeholder="Target Contrast"
-                    value={targetContract}
-                    setValue={setTargetContract} />
-                <InputSelection data={select} setData={setSelect} />
-                {/* <InputSelection data={select} setData={setSelect} /> */}
-
+                    <div className="column">
+                        <InputSelection
+                            label="model"
+                            name="model"
+                            data={model}
+                            setData={setModel}
+                            options={[{ value: 'stargan', label: 'Stargan' }, { value: 'resunet', label: 'Resunet' }]}
+                        />
+                    </div>
+                    <div className="column">
+                        <InputSelection
+                            label="dataset"
+                            name="dataset"
+                            data={dataset}
+                            setData={setDataset}
+                            options={[{ value: 'IXI', label: 'IXI' }, { value: 'BraTS2020', label: 'BraTS2020' }]} />
+                    </div>
+                </div>
                 <InputFile image={image} setImage={setImage} name="file" />
                 <Button onClick={isLoading ? () => { } : sendFile}>Generate</Button>
 

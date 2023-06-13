@@ -22,6 +22,8 @@ function Sidebar() {
             <SidebarItem icon={faArrowUpFromBracket} label={"Upload file"} to="/upload_page" />
             <SidebarItem icon={faKeyboard} label={"Input contrast"} to="/input_page" />
             <SidebarItem icon={faLaptop} label={"Choose model"} to="/choose_model" />
+            <SidebarItem icon={faLaptop} label={"Outer image"} to="/outer_image" />
+
         </div>
         <div className="sidebar-footer"></div>
     </div>

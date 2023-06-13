@@ -1,7 +1,7 @@
 import "./style.sass";
 import { useState } from "react";
 
-export default function InputSelection({ data, setData }) {
+export default function InputSelection({ data, setData, options, label, name }) {
     const handleChange = (e) => {
         if (data !== e.target.value) {
             setData(e.target.value)
@@ -10,18 +10,16 @@ export default function InputSelection({ data, setData }) {
 
     return (
         <div className="select animated zoomIn">
-            <input type="radio" name="option" />
+            <input type="radio" name={name} />
             <i className="toggle icon icon-arrow-down"></i>
             <i className="toggle icon icon-arrow-up"></i>
-            <span className="placeholder">Choose dataset...</span>
-            <label className="option">
-                <input type="radio" name="option" className="option-input" value="IXI" onChange={handleChange} />
-                <span className="title animated fadeIn">IXI</span>
-            </label>
-            <label className="option">
-                <input type="radio" name="option" className="option-input" value="BraTS2020" onChange={handleChange} />
-                <span className="title animated fadeIn">BraTS2020</span>
-            </label>
+            <span className="placeholder">Choose {label}...</span>
+            {Array.from(options).map((option) => (
+                <label className="option">
+                    <input type="radio" name={name} className="option-input" value={option.value} onChange={handleChange} />
+                    <span className="title animated fadeIn">{option.label}</span>
+                </label>
+            ))}
         </div>
     )
 }

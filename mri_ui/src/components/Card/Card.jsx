@@ -9,7 +9,7 @@ export default function Card({ res }) {
         <div className="card-container-display">
             <CardItem image_url={res["source_path"]} contrast={'source ' + res["source_contrast"]} />
             <CardItem image_url={res["generated_path"]} contrast={'generated ' + res["target_contrast"]} />
-            <CardItem image_url={res["ground_truth_path"]} contrast={'real ' + res["target_contrast"]} /> 
+            {!!res['ground_truth_path'] && <CardItem image_url={res["ground_truth_path"]} contrast={'real ' + res["target_contrast"]} />}
         </div>
     </div>
 }
