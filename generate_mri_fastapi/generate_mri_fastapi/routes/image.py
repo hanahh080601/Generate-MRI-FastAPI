@@ -10,7 +10,8 @@ import os
 
 image = APIRouter()
 # api_url_get = 'http://127.0.0.1:8000/images?name='
-api_url_get = 'http://192.168.1.12:8000/images?name='
+# api_url_get = 'http://192.168.1.12:8000/images?name='
+api_url_get = 'http://mri.hanlhn8601.tech/images?name='
 
 
 @image.get('/images')
