@@ -7,6 +7,7 @@ import Input from '../components/Input';
 import Button from '../components/Button';
 import InputFile from '../components/InputFile';
 import InputSelection from '../components/SelectionBox';
+import Metrics from '../components/Metrics';
 import './style.css';
 
 export default function ChooseModel() {
@@ -22,6 +23,8 @@ export default function ChooseModel() {
         try {
             setIsLoading(true)
             setData(null)
+            console.log(model)
+            console.log(dataset)
             const formData = new FormData()
             formData.append("file", image)
             const res = await axiosClient.post(
@@ -30,9 +33,10 @@ export default function ChooseModel() {
                 {
                     headers: { "Content-Type": "multipart/form-data" },
                     params: {
-                        ["model"]: dataset,
-                        ["src_contrast"]: sourceContract,
-                        ["trg_contrast"]: targetContract
+                        "model": model,
+                        "dataset": dataset,
+                        "src_contrast": sourceContract,
+                        "trg_contrast": targetContract
                     }
                 }
             )
@@ -102,7 +106,10 @@ export default function ChooseModel() {
                 }}
             />
             {!!data && (
-                <Card res={data} />
+                <>
+                    <Metrics res={data} />
+                    <Card res={data} />
+                </>
             )}
         </div>
     </>

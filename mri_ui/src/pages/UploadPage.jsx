@@ -7,6 +7,7 @@ import Input from '../components/Input';
 import Button from '../components/Button';
 import InputFile from '../components/InputFile';
 import InputSelection from '../components/SelectionBox';
+import Metrics from '../components/Metrics';
 import './style.css';
 
 export default function Test() {
@@ -86,7 +87,10 @@ export default function Test() {
                 }}
             />
             {!!data && (
-                <Card res={data} />
+                <>
+                    <Metrics res={data} />
+                    <Card res={data} />
+                </>
             )}
         </div>
     </>

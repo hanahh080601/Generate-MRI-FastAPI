@@ -48,7 +48,7 @@ export default function Test() {
 
     return <>
         <div className='page-container'>
-            <h1 className='page-title'>Test page</h1>
+            <h1 className='page-title'>MRI SYNTHESIS</h1>
             <div className="input-form-container">
                 <Input
                     name="source_contrast"

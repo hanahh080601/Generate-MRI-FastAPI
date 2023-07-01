@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Form, File, UploadFile
-from generator import stargan_both_generator, stargan_single_generator, resunet_both_generator, resunet_single_generator
+from generator import stargan_generator, resunet_generator
 from fastapi.responses import FileResponse
 from PIL import Image
 import io
@@ -28,7 +28,7 @@ async def generate_image_without_ground_truth(file: UploadFile = File(...), src_
     try:
         content = await file.read()
         img = Image.open(io.BytesIO(content))
-        source_path, generated_path = stargan_both_generator.generate(img, src_contrast, trg_contrast)
+        source_path, generated_path = resunet_generator.generate(img, src_contrast, trg_contrast)
         return {
             "source_path": api_url_get + source_path, 
             "generated_path": api_url_get + generated_path,
@@ -42,7 +42,7 @@ async def generate_image_without_ground_truth(file: UploadFile = File(...), src_
 @image.post('/generate/input_target_contrast')
 async def generate_image_faster(dataset: str='IXI', source_contrast: str = 't1', target_contrast: str = 't2'):
     try:
-        source_path, generated_path, ground_truth_path, ssim, psnr, nmae = stargan_both_generator.generate_faster(dataset, source_contrast, target_contrast)
+        source_path, generated_path, ground_truth_path, ssim, psnr, nmae = resunet_generator.generate_faster(dataset, source_contrast, target_contrast)
         return {
             "source_path": api_url_get + source_path, 
             "generated_path": api_url_get + generated_path, 
@@ -64,7 +64,7 @@ async def generate_from_uploaded_image(file: UploadFile = File(...), dataset: st
     try:
         print(file.filename)
         print(dataset, src_contrast, trg_contrast)
-        source_path, generated_path, ground_truth_path, ssim, psnr, nmae = stargan_both_generator.generate_from_uploaded_image(dataset, file.filename, src_contrast, trg_contrast)
+        source_path, generated_path, ground_truth_path, ssim, psnr, nmae = resunet_generator.generate_from_uploaded_image(dataset, file.filename, src_contrast, trg_contrast)
         return {
             "source_path": api_url_get + source_path, 
             "generated_path": api_url_get + generated_path, 
@@ -82,11 +82,11 @@ async def generate_from_uploaded_image(file: UploadFile = File(...), dataset: st
     return None
 
 @image.post('/generate/uploaded_file_choosing_model')  
-async def generate_choosing_model(file: UploadFile = File(...), model: str = 'stargan', dataset: str = 'IXI', src_contrast: str = 't1', trg_contrast: str = 't2'):
+async def generate_choosing_model(file: UploadFile = File(...), model: str = 'stargan', dataset: str = 'BraTS2020', src_contrast: str = 't1', trg_contrast: str = 't2'):
     try:
-        model = stargan_both_generator if model == 'stargan' else resunet_both_generator
         print(file.filename)
-        print(dataset, src_contrast, trg_contrast)
+        print(model, dataset, src_contrast, trg_contrast)
+        model = stargan_generator if model == 'stargan' else resunet_generator
         source_path, generated_path, ground_truth_path, ssim, psnr, nmae = model.generate_from_uploaded_image(dataset, file.filename, src_contrast, trg_contrast)
         return {
             "source_path": api_url_get + source_path, 

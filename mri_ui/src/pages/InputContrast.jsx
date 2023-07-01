@@ -6,6 +6,7 @@ import Card from '../components/Card/Card';
 import Input from '../components/Input';
 import Button from '../components/Button';
 import InputSelection from '../components/SelectionBox';
+import Metrics from '../components/Metrics';
 import './style.css';
 
 export default function Test() {
@@ -39,7 +40,7 @@ export default function Test() {
 
     return <>
         <div className='page-container'>
-            <h1 className='page-title'>Test page</h1>
+            <h1 className='page-title'>MRI SYNTHESIS</h1>
             <div className="input-form-container">
                 <Input
                     name="source_contrast"
@@ -74,7 +75,10 @@ export default function Test() {
                 }}
             />
             {!!data && (
-                <Card res={data} />
+                <>
+                    <Metrics res={data} />
+                    <Card res={data} />
+                </>
             )}
         </div>
     </>

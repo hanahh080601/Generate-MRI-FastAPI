@@ -7,6 +7,8 @@ export default function InputSelection({ data, setData, options, label, name }) 
             setData(e.target.value)
         }
     }
+    console.log(data)
+    // console.log
 
     return (
         <div className="select animated zoomIn">
@@ -14,8 +16,8 @@ export default function InputSelection({ data, setData, options, label, name }) 
             <i className="toggle icon icon-arrow-down"></i>
             <i className="toggle icon icon-arrow-up"></i>
             <span className="placeholder">Choose {label}...</span>
-            {Array.from(options).map((option) => (
-                <label className="option">
+            {Array.from(options).map((option, index) => (
+                <label className="option" key={index}>
                     <input type="radio" name={name} className="option-input" value={option.value} onChange={handleChange} />
                     <span className="title animated fadeIn">{option.label}</span>
                 </label>

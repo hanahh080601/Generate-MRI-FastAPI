@@ -1,32 +1,26 @@
 import torch
 import numpy as np
 from config.config import CFG
-from models.stargan import Generator, ResUnet
+from models.stargan import Generator, ResUnet, ResUnetPlus
 from torchvision import transforms as T
 from database.dataset import CustomDatasetOneImage, CustomDatasetFaster, DatasetOnlyImage
 from torch.utils.data import DataLoader
 from utils.metrics import Metrics
 from torchvision.utils import save_image
+from PIL import Image
+import torchvision.transforms.functional as TF
 
 class GeneratorModel:
-    def __init__(self, model='stargan', mode='both') -> None:
+    def __init__(self, model='stargan') -> None:
         self.device = CFG.device
-
-        if model == 'stargan' and mode == 'both':
+        self.model_type = model
+        if model == 'stargan':
             self.model = Generator(CFG.g_conv_dim, CFG.c_dim+CFG.c2_dim+2, CFG.g_repeat_num)
             self.model.load_state_dict(torch.load(CFG.G_stargan_both_path, map_location=lambda storage, loc: storage))
 
-        elif model == 'resunet' and mode == 'both':
-            self.model = ResUnet(CFG.g_conv_dim, CFG.c_dim+CFG.c2_dim+2, CFG.g_repeat_num)
-            self.model.load_state_dict(torch.load(CFG.G_resunet_both_path, map_location=lambda storage, loc: storage))
-
-        elif model == 'stargan' and mode == 'single':
-            self.model = Generator(CFG.g_conv_dim, CFG.c_dim, CFG.g_repeat_num)
-            self.model.load_state_dict(torch.load(CFG.G_stargan_single_path, map_location=lambda storage, loc: storage))
-            
         else:
-            self.model = ResUnet(CFG.g_conv_dim, CFG.c_dim, CFG.g_repeat_num)
-            self.model.load_state_dict(torch.load(CFG.G_resunet_single_path, map_location=lambda storage, loc: storage))
+            self.model = ResUnetPlus(CFG.g_conv_dim, CFG.c_dim+CFG.c2_dim+2, CFG.g_repeat_num)
+            self.model.load_state_dict(torch.load(CFG.G_resunet_both_path, map_location=lambda storage, loc: storage))
 
         self.model.to(self.device)
         self.metrics = Metrics()
@@ -124,6 +118,12 @@ class GeneratorModel:
             save_image(self.denorm(x_fake.data.cpu()), generated_path, nrow=1, padding=0)
             save_image(self.denorm(x_real.data.cpu()), source_path, nrow=1, padding=0)
 
+            if self.model_type != 'stargan' and target_contrast not in ['mra']:
+                image = Image.open(generated_path)
+                image_tensor = TF.to_tensor(image)
+                grayscale_tensor = image_tensor.mean(dim=0, keepdim=True)
+                save_image(grayscale_tensor, generated_path, normalize=True, range=(0, 1))
+
             return source_path, generated_path
 
         
@@ -173,6 +173,13 @@ class GeneratorModel:
 
             save_image(self.denorm(x_fake.data.cpu()), generated_path, nrow=1, padding=0)
             save_image(self.denorm(x_real.data.cpu()), source_path, nrow=1, padding=0)
+
+            if self.model_type != 'stargan' and target_contrast not in ['mra']:
+                image = Image.open(generated_path)
+                image_tensor = TF.to_tensor(image)
+                grayscale_tensor = image_tensor.mean(dim=0, keepdim=True)
+                save_image(grayscale_tensor, generated_path, normalize=True, range=(0, 1))
+
             if len(ground_truth_path):
                 save_image(self.denorm(target.data.cpu()), ground_truth_path, nrow=1, padding=0)
                 ssim = self.metrics.calculate_ssim(x_fake.data.cpu(), target.data.cpu())
@@ -229,6 +236,12 @@ class GeneratorModel:
             save_image(self.denorm(x_fake.data.cpu()), generated_path, nrow=1, padding=0)
             save_image(self.denorm(x_real.data.cpu()), source_path, nrow=1, padding=0)
 
+            if self.model_type != 'stargan' and target_contrast not in ['mra']:
+                image = Image.open(generated_path)
+                image_tensor = TF.to_tensor(image)
+                grayscale_tensor = image_tensor.mean(dim=0, keepdim=True)
+                save_image(grayscale_tensor, generated_path, normalize=True, range=(0, 1))
+
             if len(ground_truth_path):
                 save_image(self.denorm(target.data.cpu()), ground_truth_path, nrow=1, padding=0)
                 ssim = self.metrics.calculate_ssim(x_fake.data.cpu(), target.data.cpu())
@@ -237,5 +250,7 @@ class GeneratorModel:
 
             return source_path, generated_path, ground_truth_path, float(ssim), float(psnr), float(nmae)
         
+    
+   
     
         

@@ -30,8 +30,10 @@ class CFG:
     brats_contrast_list = ['flair', 't1', 't1ce', 't2']
 
     # Directories.
-    G_stargan_both_path = '/home/han/Desktop/hanlhn_dut/StarGANs-Generate-MRI-2D-images/stargan_both/models/200000-G.ckpt'
-    G_resunet_both_path = '/home/han/Desktop/hanlhn_dut/StarGANs-Generate-MRI-2D-images/resunet_both/models/200000-G.ckpt'
+    G_stargan_both_path = '/home/han/Desktop/hanlhn_dut/StarGANs-Generate-MRI-2D-images/stargan_new_loss_both/models/200000-G.ckpt'
+    G_resunet_both_path = '/home/han/Desktop/hanlhn_dut/StarGANs-Generate-MRI-2D-images/resunet_custom_new_loss_both/models/200000-G.ckpt'
+    # G_resunet_both_path = '/home/han/Desktop/hanlhn_dut/StarGANs-Generate-MRI-2D-images/resunet_custom_both/models/200000-G.ckpt'
+
     G_stargan_single_path = '/home/han/Desktop/hanlhn_dut/StarGANs-Generate-MRI-2D-images/stargan_ixi/models/200000-G.ckpt'
     G_resunet_single_path = '/home/han/Desktop/hanlhn_dut/StarGANs-Generate-MRI-2D-images/resunet_ixi/models/200000-G.ckpt'
     brats2020_image_dir = '/home/han/MRI_DATA/BraTS2020 StarGANs/image_2D/test'
