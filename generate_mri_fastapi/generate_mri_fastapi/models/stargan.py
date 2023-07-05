@@ -15,6 +15,7 @@ class ResBlock(nn.Module):
         else:
             self.downsample = None
         if upsample:
+            # deconcolution
             self.upsample = nn.ConvTranspose2d(out_channels, out_channels // 2, kernel_size=2, stride=2)
         else:
             self.upsample = None
@@ -35,25 +36,69 @@ class ResBlock(nn.Module):
         else:
             actual_out = out
         return actual_out, out
+    
+class ResUnetPlus(nn.Module):
+    def __init__(self, conv_dim=64, c_dim=4, repeat_num=6):
+        super(ResUnetPlus, self).__init__()
 
+        self.input = []
+        self.input.append(nn.Conv2d(3+c_dim, conv_dim, kernel_size=7, stride=1, padding=3, bias=False))
+        self.input.append(nn.InstanceNorm2d(conv_dim, affine=True, track_running_stats=True))
+        self.input.append(nn.ReLU(inplace=True))
+        self.input = nn.Sequential(*self.input)
+
+        self.down_block1 = ResBlock(conv_dim, conv_dim*2, downsample=True)
+        self.down_block2 = ResBlock(conv_dim*2, conv_dim*4, downsample=True)
+        
+        self.bottle_neck = []
+        for i in range(repeat_num):
+            self.bottle_neck.append(ResidualBlock(conv_dim*4, conv_dim*4))
+        self.bottle_neck = nn.Sequential(*self.bottle_neck)
+        
+        self.encoder = ResBlock(conv_dim*4, conv_dim*2, upsample=True)  
+        self.up_block1 = ResBlock(conv_dim*4 + conv_dim, conv_dim*2, upsample=True)
+        self.up_block2 = ResBlock(conv_dim*2 + conv_dim, conv_dim)
+        
+        self.output = []
+        self.output.append(nn.Conv2d(conv_dim, 3, kernel_size=7, stride=1, padding=3, bias=False))
+        self.output.append(nn.Tanh())
+        self.output = nn.Sequential(*self.output)
+    
+    def forward(self, x, c):
+        c = c.view(c.size(0), c.size(1), 1, 1)
+        c = c.repeat(1, 1, x.size(2), x.size(3))
+        x = torch.cat([x, c], dim=1)
+
+        x = self.input(x)
+        out, down1 = self.down_block1(x)
+        out, down2 = self.down_block2(out)
+        out = self.bottle_neck(out)
+        out, _ = self.encoder(out)
+        out = torch.cat([out, down2], dim=1)
+        out, _ = self.up_block1(out)
+        out = torch.cat([out, down1], dim=1)
+        out, _ = self.up_block2(out)
+        out = self.output(out)
+        return out
 
 
 class ResUnet(nn.Module):
-    def __init__(self):
+    def __init__(self, conv_dim=64, c_dim=4, repeat_num=6):
         super(ResUnet, self).__init__()
-        self.down_block1 = ResBlock(3, 64, downsample=True)
-        self.down_block2 = ResBlock(64, 128, downsample=True)
-        self.encoder = ResBlock(128, 256, upsample=True)  
-        self.up_block = ResBlock(256, 128, upsample=True)    
-        self.final_block = ResBlock(128, 64)
-        self.final_conv = nn.Conv2d(64, 3, kernel_size=3, stride=1, padding=1)
+        self.down_block1 = ResBlock(3+c_dim, conv_dim, downsample=True)
+        self.down_block2 = ResBlock(conv_dim, conv_dim*2, downsample=True)
+        self.encoder = ResBlock(conv_dim*2, conv_dim*4, upsample=True)  
+        self.up_block = ResBlock(conv_dim*4, conv_dim*2, upsample=True)    
+        self.final_block = ResBlock(conv_dim*2, conv_dim)
+        self.final_conv = nn.Conv2d(conv_dim, 3, kernel_size=3, stride=1, padding=1)
 
-    def forward(self, x):
+    def forward(self, x, c):
+        c = c.view(c.size(0), c.size(1), 1, 1)
+        c = c.repeat(1, 1, x.size(2), x.size(3))
+        x = torch.cat([x, c], dim=1)
         out, down1 = self.down_block1(x)
         out, down2 = self.down_block2(out)
         out, _ = self.encoder(out)
-        print(out.shape)
-        print(down2.shape)
         out = torch.cat([out, down2], dim=1)
         out, _ = self.up_block(out)
         out = torch.cat([out, down1], dim=1)

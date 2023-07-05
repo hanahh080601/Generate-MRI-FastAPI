@@ -1,80 +1,32 @@
-# Sentiment Classification using BERT model (Pytorch, FastAPI, MongoDB & Jinja2)
-
-## Tasks 
-* Preprocessing data
-  * Loading data.
-  * Bert tokenizing.
-* Building model
-  * Load Bert-based model and config with Dropout & Linear layers at last.
-  * Override forward function.
-* Training
-  * Define criterion, optimizer.
-  * Execute (train, validate).
-  * Early stopping. 
-  * Save model.
-* Evaluating
-  * Accuracy: approx 93% on test set.
-
+# MRI Synthesis Using Deep Learning Models (Pytorch, FastAPI & ReactJS)
 
 ## Installation
 
 Clone the repo from Github and pull the project.
 ```bash
-git clone https://github.com/hanahh080601/Sentiment-Classification.git
-git checkout front-end (if necessary: includes UI)
+git clone https://github.com/hanahh080601/Generate-MRI-FastAPI
+git checkout hanlhn/update_api
 git pull
-cd sentiment-classification/sentiment-classification
+# Back-end
+cd generate_mri_fastapi
 poetry install
 poetry config virtualenvs.in-project true
-poetry update
-```
 
-# Project tree 
-```bash
-.  
-├── sentiment-classification            
-│     ├── .venv               
-│     ├── poetry.lock      
-│     ├── pyproject.toml     
-│     ├── README.rst    
-│     └── sentiment-classification      
-│           ├── database              
-│           │      ├── __init__.py       
-│           │      └── database.py                 
-│           ├── models          
-│           │      ├── bert.py      
-│           │      ├── best_model.pt (not pushed)        
-│           │      └── comment.py        
-│           ├── predict         
-│           │      ├── __init__.py       
-│           │      └── train.py     
-│           ├── routes                
-│           │      └── comment.py     
-│           ├── schemas                
-│           │      └── comment.py    
-│           ├── static                
-│           │      └── style.css    
-│           ├── templates                
-│           │      └── index.html     
-│           ├── notebooks         
-│           │      ├── Sentiment-Classification.ipynb        
-│           │      └── test.ipynb         
-│           ├── __init__.py  
-│           ├── main.py         
-│           └── config    
-│                  ├── config.py              
-│                  └── mongodb.py    
-├── tests           
-│     ├── __init__.py            
-│     └── test_sentiment_classification.py             
-├── .gitignore                         
-└── README.md       
+# Front-end
+yarn install
 ```
 
 ## Usage: 
 ```bash
-cd sentiment-classification/sentiment-classification
-uvicorn main:app --reload
+# Back-end
+cd generate_mri_fastapi
+. .venv/bin/activate
+cd generate_mri_fastapi
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
+
+# Front-end
+cd mri_ui
+yarn start
 ```
 
 ## Contributing
